@@ -38,7 +38,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup Source FileList",
+						"activity": "WaitTestForBranch",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -133,7 +133,7 @@
 				"type": "Wait",
 				"dependsOn": [
 					{
-						"activity": "Process Each File",
+						"activity": "Lookup Source FileList",
 						"dependencyConditions": [
 							"Succeeded"
 						]
