@@ -1,0 +1,25 @@
+{
+	"name": "tg_Ingest_ecdc_data",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ecdc_data",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-05-23T15:55:00",
+				"endTime": "2022-06-30T04:26:20",
+				"timeZone": "Canada Central Standard Time"
+			}
+		}
+	}
+}

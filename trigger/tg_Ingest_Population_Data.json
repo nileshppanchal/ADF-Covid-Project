@@ -1,0 +1,33 @@
+{
+	"name": "tg_Ingest_Population_Data",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_ingest_population_data",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2022-05-22T15:34:00",
+				"endTime": "2022-05-24T15:34:00",
+				"timeZone": "Canada Central Standard Time",
+				"schedule": {
+					"minutes": [
+						15
+					],
+					"hours": [
+						10
+					]
+				}
+			}
+		}
+	}
+}

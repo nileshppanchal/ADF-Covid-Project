@@ -1,0 +1,145 @@
+{
+	"name": "df_Population",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_population_raw_tsv",
+						"type": "DatasetReference"
+					},
+					"name": "sourcePopulationRaw"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_country_lookup",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Processed_Population",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectColsInUse"
+				},
+				{
+					"name": "derivedColumnCountryAgeGroup"
+				},
+				{
+					"name": "derivedColumnShiftCols"
+				},
+				{
+					"name": "selectCountryLookup"
+				},
+				{
+					"name": "lookupCountry"
+				},
+				{
+					"name": "pivotAgeGroup"
+				},
+				{
+					"name": "selectInUse"
+				},
+				{
+					"name": "selectToSink"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          indic_de as string,",
+				"          {geo\\time} as string,",
+				"          {2008 } as string,",
+				"          {2009 } as string,",
+				"          {2010 } as string,",
+				"          {2011 } as string,",
+				"          {2012 } as string,",
+				"          {2013 } as string,",
+				"          {2014 } as string,",
+				"          {2015 } as string,",
+				"          {2016 } as string,",
+				"          {2017 } as string,",
+				"          {2018 } as string,",
+				"          {2019 } as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourcePopulationRaw",
+				"source(output(",
+				"          country as string,",
+				"          country_code_2_digit as string,",
+				"          country_code_3_digit as string,",
+				"          continent as string,",
+				"          population as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"derivedColumnShiftCols select(mapColumn(",
+				"          YearGroupCountry = indic_de,",
+				"          {2019P} = {2019 }",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColsInUse",
+				"selectColsInUse derive(AgeGroup = replace(substringIndex(YearGroupCountry, \",\", 1), \"PC_\", \"\"),",
+				"          Country = left(replace(YearGroupCountry, substringIndex(YearGroupCountry, \",\", 1)+\",\", \"\")  , 2)) ~> derivedColumnCountryAgeGroup",
+				"sourcePopulationRaw derive({2018 } = {2017 },",
+				"          {2019 } = {2018 }) ~> derivedColumnShiftCols",
+				"source1 select(mapColumn(",
+				"          country,",
+				"          country_code_2_digit,",
+				"          country_code_3_digit,",
+				"          population",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectCountryLookup",
+				"pivotAgeGroup, selectCountryLookup lookup(pivotAgeGroup@Country == country_code_2_digit,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupCountry",
+				"selectInUse pivot(groupBy(Country),",
+				"     pivotBy(AgeGroup, ['Y0_14', 'Y15_24', 'Y25_49', 'Y50_64', 'Y65_79', 'Y80_MAX']),",
+				"     Population_ = max({2019P}),",
+				"     columnNaming: '$N$V',",
+				"     lateral: true) ~> pivotAgeGroup",
+				"derivedColumnCountryAgeGroup select(mapColumn(",
+				"          Country,",
+				"          AgeGroup,",
+				"          {2019P}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectInUse",
+				"lookupCountry select(mapColumn(",
+				"          country = selectCountryLookup@country,",
+				"          country_code_3_digit,",
+				"          country_code_2_digit,",
+				"          population,",
+				"          Population_Y0_14,",
+				"          Population_Y15_24,",
+				"          Population_Y25_49,",
+				"          Population_Y50_64,",
+				"          Population_Y65_79,",
+				"          Population_Y80_MAX",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectToSink",
+				"selectToSink sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

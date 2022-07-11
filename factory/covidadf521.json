@@ -1,0 +1,9 @@
+{
+	"name": "covidadf521",
+	"location": "canadacentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "dc4a0963-20e7-4e81-abaa-982aa1008fe8",
+		"tenantId": "d4818d3c-8af9-49c8-87f7-ba3cf62ad6d3"
+	}
+}
