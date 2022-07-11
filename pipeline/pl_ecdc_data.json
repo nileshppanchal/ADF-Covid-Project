@@ -38,7 +38,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup Source FileList",
+						"activity": "WaitTestForBranch",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -126,6 +126,22 @@
 							]
 						}
 					]
+				}
+			},
+			{
+				"name": "WaitTestForBranch",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Lookup Source FileList",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
 				}
 			}
 		],
